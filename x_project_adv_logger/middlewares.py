@@ -35,8 +35,18 @@ def error_pages(overrides):
     return middleware
 
 
+async def xml_http_request_middleware(app, handler):
+    async def middleware_handler(request):
+        headers = request.headers
+        request.is_xml_http = bool(headers.get('X-Requested-With', False))
+        return await handler(request)
+
+    return middleware_handler
+
+
 def setup_middlewares(app):
     error_middleware = error_pages({404: handle_404,
                                     405: handle_405,
                                     500: handle_500})
     app.middlewares.append(error_middleware)
+    app.middlewares.append(xml_http_request_middleware)

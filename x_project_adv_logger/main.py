@@ -6,10 +6,11 @@ import sys
 from aiohttp import web
 from trafaret_config import commandline
 
-# from aiohttpdemo_polls.db import close_pg, init_pg
+from .db import init_db
 from .middlewares import setup_middlewares
 from .routes import setup_routes
-from .utils import TRAFARET
+from .signal import on_startup
+from .utils import TRAFARET_CONF
 
 
 def init(loop, argv):
@@ -21,15 +22,14 @@ def init(loop, argv):
     #
     options = ap.parse_args(argv)
 
-    config = commandline.config_from_options(options, TRAFARET)
+    config = commandline.config_from_options(options, TRAFARET_CONF)
 
-    # setup application and extensions
     app = web.Application(loop=loop)
 
-    # load config from yaml file in current dir
     app['config'] = config
+    init_db(app)
 
-    # setup views and routes
+    on_startup(app)
     setup_routes(app)
     setup_middlewares(app)
 
@@ -37,12 +37,19 @@ def init(loop, argv):
 
 
 def main(argv):
-    # init logging
-    logging.basicConfig(level=logging.DEBUG)
+    log = logging.getLogger('aiohttp')
+    log.setLevel(logging.DEBUG)
+
+    f = logging.Formatter('[L:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s', datefmt='%d-%m-%Y %H:%M:%S')
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+    ch.setFormatter(f)
+    log.addHandler(ch)
 
     loop = asyncio.get_event_loop()
 
     app = init(loop, argv)
+    app['log'] = log
     web.run_app(app,
                 host=app['config']['host'],
                 port=app['config']['port'])
