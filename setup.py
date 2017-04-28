@@ -22,7 +22,8 @@ install_requires = ['aiohttp',
                     'aiodns',
                     'motor',
                     'ujson',
-                    'trafaret-config']
+                    'trafaret-config',
+                    'pytz']
 
 setup(
     name="X-Project-Adv-Logger",

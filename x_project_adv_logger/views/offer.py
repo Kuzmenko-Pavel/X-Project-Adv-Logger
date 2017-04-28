@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from aiohttp import web
 from pymongo import InsertOne
 from trafaret.constructor import construct
@@ -24,9 +26,10 @@ class OfferView(web.View):
                 region = data['params']['region']
                 request = data['params']['request']
                 test = data['params']['test']
+                dt = datetime.now()
                 for i in data['items']:
                     doc = {}
-                    doc['dt'] = ''
+                    doc['dt'] = dt
                     doc['id'] = i['guid']
                     doc['id_int'] = i['id']
                     doc['title'] = i['title']
