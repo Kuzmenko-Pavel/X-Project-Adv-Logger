@@ -1,6 +1,7 @@
 import argparse
 import asyncio
 import logging
+import os
 import sys
 
 from aiohttp import web
@@ -14,10 +15,11 @@ from .utils import TRAFARET_CONF
 
 
 def init(loop, argv):
+    dir_path = os.path.dirname(os.path.realpath(__file__))
     ap = argparse.ArgumentParser(description='Great Description To Be Here')
     ap.add_argument('-s', "--socket", action='store', dest='socket', help='unix socket')
     commandline.standard_argparse_options(ap.add_argument_group('configuration'),
-                                          default_config='./conf.yaml')
+                                          default_config=dir_path + '/../conf.yaml')
     #
     # define your command-line arguments here
     #
