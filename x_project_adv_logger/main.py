@@ -14,18 +14,17 @@ from .utils import TRAFARET_CONF
 
 
 def init(loop, argv):
-    ap = argparse.ArgumentParser()
-    commandline.standard_argparse_options(ap,
+    ap = argparse.ArgumentParser(description='Great Description To Be Here')
+    ap.add_argument('-s', "--socket", action='store', dest='socket', help='unix socket')
+    commandline.standard_argparse_options(ap.add_argument_group('configuration'),
                                           default_config='./conf.yaml')
     #
     # define your command-line arguments here
     #
     options = ap.parse_args(argv)
-
     config = commandline.config_from_options(options, TRAFARET_CONF)
-
+    config['socket'] = options.socket
     app = web.Application(loop=loop)
-
     app['config'] = config
     init_db(app)
 
@@ -50,9 +49,10 @@ def main(argv):
 
     app = init(loop, argv)
     app['log'] = log
-    web.run_app(app,
-                host=app['config']['host'],
-                port=app['config']['port'])
+    if app['config']['socket']:
+        web.run_app(app, path=app['config']['socket'], backlog=1024)
+    else:
+        web.run_app(app, host=app['config']['host'], port=app['config']['port'], backlog=1024)
 
 
 if __name__ == '__main__':
