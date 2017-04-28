@@ -18,8 +18,8 @@ class OfferView(web.View):
             except Exception as e:
                 self.request.app['log'].debug(exception_message())
             else:
-                inf = data['params']['informer_id_int']
-                inf_int = data['params']['informer_id']
+                inf = data['params']['informer_id']
+                inf_int = data['params']['informer_id_int']
                 ip = data['params']['ip']
                 cookie = data['params']['cookie']
                 country = data['params']['country']
