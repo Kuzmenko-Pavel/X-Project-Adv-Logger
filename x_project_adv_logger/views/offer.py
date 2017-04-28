@@ -4,7 +4,7 @@ from aiohttp import web
 from pymongo import InsertOne
 from trafaret.constructor import construct
 
-from ..utils import TRAFARET_OFFER_DATA
+from ..utils import TRAFARET_OFFER_DATA, exception_message
 
 
 class OfferView(web.View):
@@ -16,7 +16,7 @@ class OfferView(web.View):
                 data = await self.request.json()
                 validator(data)
             except Exception as e:
-                self.request.app['log'].debug(e)
+                self.request.app['log'].debug(exception_message())
             else:
                 inf = data['params']['informer_id_int']
                 inf_int = data['params']['informer_id']
@@ -56,6 +56,7 @@ class OfferView(web.View):
                     doc['test'] = test
                     doc['request'] = request
                     docs.append(InsertOne(doc))
-            await self.request.app.offer.bulk_write(docs)
+            if len(docs) > 0:
+                await self.request.app.offer.bulk_write(docs)
         resp_data = {'status': self.request.is_xml_http}
         return web.json_response(resp_data)
