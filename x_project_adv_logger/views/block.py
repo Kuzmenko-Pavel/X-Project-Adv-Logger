@@ -17,7 +17,7 @@ class BlockView(web.View):
                "{p=p.replace(new RegExp('\\\\b'+e(c)+'\\\\b','g'),k[c])}}return p}('3 0=4.5(6);2(0){2(0.1){0.1.7(0)}};" \
                "',8,8,'el|parentNode|if|var|document|getElementById|\"yt" + str(
             rand) + "\"|removeChild'.split('|'),0,{}))\n//]]>"
-        if headers.get('Referer', '') != '':
+        if len(headers.get('Referer', '')) < 10:
             body = 'yta = {}'
         else:
             doc['dt'] = dt
