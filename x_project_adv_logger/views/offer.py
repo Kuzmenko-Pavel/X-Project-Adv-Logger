@@ -19,6 +19,9 @@ class OfferView(web.View):
                 self.request.app['log'].debug(exception_message())
             else:
                 try:
+                    capacity = data['informer']['capacity']
+                    exclude_capacity = len(data['params']['exclude'].split(';'))
+                    view_number = exclude_capacity / capacity
                     inf = data['params']['informer_id']
                     inf_int = data['params']['informer_id_int']
                     ip = data['params']['ip']
@@ -56,6 +59,9 @@ class OfferView(web.View):
                         doc['matching'] = ''
                         doc['test'] = test
                         doc['request'] = request
+                        doc['capacity'] = capacity
+                        doc['exclude_capacity'] = exclude_capacity
+                        doc['view_number'] = view_number
                         docs.append(InsertOne(doc))
                 except Exception as e:
                     print(data)
