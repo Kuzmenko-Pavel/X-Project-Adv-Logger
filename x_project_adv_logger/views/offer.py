@@ -19,15 +19,10 @@ class OfferView(web.View):
                 self.request.app['log'].debug(exception_message())
             else:
                 try:
-                    capacity = data['informer']['capacity']
-                    exclude_capacity = len(data['params']['exclude'].split(';'))
-                    view_number = exclude_capacity / capacity
                     inf = data['params']['informer_id']
                     inf_int = data['params']['informer_id_int']
                     ip = data['params']['ip']
                     cookie = data['params']['cookie']
-                    country = data['params']['country']
-                    region = data['params']['region']
                     request = data['params']['request']
                     test = data['params']['test']
                     dt = datetime.now()
@@ -36,32 +31,19 @@ class OfferView(web.View):
                         doc['dt'] = dt
                         doc['id'] = i['guid']
                         doc['id_int'] = i['id']
-                        doc['title'] = i['title']
                         doc['inf'] = inf
                         doc['inf_int'] = inf_int
                         doc['ip'] = ip
                         doc['cookie'] = cookie
                         doc['social'] = i['campaign_social']
                         doc['token'] = i['token']
-                        doc['type'] = 'teaser'
-                        doc['isOnClick'] = True
                         doc['campaignId'] = i['campaign_guid']
-                        doc['account_id'] = i['campaign_account']
                         doc['campaignId_int'] = i['campaign_id']
-                        doc['campaignTitle'] = i['campaign_title']
-                        doc['project'] = i['campaign_project']
-                        doc['country'] = country
-                        doc['region'] = region
                         doc['retargeting'] = i['retargeting']
-                        doc['keywords'] = {'search': '', 'context': ''}
                         doc['branch'] = i['branch']
                         doc['conformity'] = 'place'
-                        doc['matching'] = ''
                         doc['test'] = test
                         doc['request'] = request
-                        doc['capacity'] = capacity
-                        doc['exclude_capacity'] = exclude_capacity
-                        doc['view_number'] = view_number
                         docs.append(InsertOne(doc))
                 except Exception as e:
                     print(data)
