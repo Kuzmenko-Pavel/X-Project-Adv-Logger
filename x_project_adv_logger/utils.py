@@ -21,7 +21,6 @@ TRAFARET_CONF = T.Dict({
 })
 
 TRAFARET_OFFER_DATA = T.Dict({
-    T.Key('informer'): T.Any,
     T.Key('params'): T.Any,
     T.Key('items'): T.List(T.Any),
 })

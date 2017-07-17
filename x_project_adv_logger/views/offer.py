@@ -16,7 +16,7 @@ class OfferView(web.View):
                 data = await self.request.json()
                 validator(data)
             except Exception as e:
-                self.request.app['log'].debug(exception_message())
+                self.request.app['log'].warning(exception_message())
             else:
                 try:
                     inf = data['params']['informer_id']
@@ -47,7 +47,7 @@ class OfferView(web.View):
                         docs.append(InsertOne(doc))
                 except Exception as e:
                     print(data)
-                    self.request.app['log'].debug(exception_message())
+                    self.request.app['log'].warning(exception_message())
             if len(docs) > 0:
                 await self.request.app.offer.bulk_write(docs)
         resp_data = {'status': self.request.is_xml_http}
