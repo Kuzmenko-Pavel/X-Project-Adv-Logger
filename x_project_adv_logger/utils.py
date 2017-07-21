@@ -23,7 +23,14 @@ TRAFARET_CONF = T.Dict({
 
 TRAFARET_OFFER_DATA = T.Dict({
     T.Key('informer', optional=True): T.Any,
-    T.Key('params'): T.Any,
+    T.Key('params'): T.Dict({
+        T.Key('cookie'): T.String(),
+        T.Key('informer_id'): T.String(),
+        T.Key('informer_id_int'): T.Int(),
+        T.Key('ip'): T.String(),
+        T.Key('request'): T.String(),
+        T.Key('test'): T.Bool(),
+    }),
     T.Key('items'): T.List(T.Any),
 })
 

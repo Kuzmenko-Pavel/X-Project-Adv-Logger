@@ -10,13 +10,13 @@ from ..utils import TRAFARET_OFFER_DATA, exception_message
 class OfferView(web.View):
     async def post(self):
         docs = []
-        if self.request.is_xml_http:
+        if self.request.is_xml_http and self.request.has_body:
             try:
                 validator = construct(TRAFARET_OFFER_DATA)
                 data = await self.request.json()
                 validator(data)
             except Exception as e:
-                self.request.app['log'].warning(exception_message(exc=str(e)))
+                self.request.app['log'].warning(exception_message(exc=str(e), request=str(self.request._message)))
             else:
                 try:
                     inf = data['params']['informer_id']
@@ -46,8 +46,12 @@ class OfferView(web.View):
                         doc['request'] = request
                         docs.append(InsertOne(doc))
                 except Exception as e:
-                    self.request.app['log'].warning(exception_message(exc=str(e), data=data))
+                    self.request.app['log'].warning(exception_message(exc=str(e),
+                                                                      data=data,
+                                                                      request=str(self.request._message)))
             if len(docs) > 0:
                 await self.request.app.offer.bulk_write(docs)
+            else:
+                self.request.app['log'].warning('EMPTY %s' % str(self.request._message))
         resp_data = {'status': self.request.is_xml_http}
         return web.json_response(resp_data)
