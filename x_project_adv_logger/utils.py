@@ -30,7 +30,7 @@ TRAFARET_OFFER_DATA = T.Dict({
         T.Key('ip'): T.String(),
         T.Key('request'): T.String(),
         T.Key('test'): T.Bool(),
-    }),
+    }).ignore_extra('*'),
     T.Key('items'): T.List(T.Any),
 })
 
