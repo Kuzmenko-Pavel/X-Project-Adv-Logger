@@ -7,6 +7,8 @@ async def check_collection(app):
     conf = app['config']['mongo']
     block = await app.block.options()
     offer = await app.offer.options()
+    print(block)
+    print(offer)
     if not block.get('capped', False):
         try:
             await app.db.drop_collection(conf['collection']['block'])

@@ -10,7 +10,6 @@ TRAFARET_CONF = T.Dict({
     T.Key('mongo'):
         T.Dict({
             'uri': T.String(),
-            'db': T.String(),
             T.Key('collection'):
                 T.Dict({
                     'offer': T.String(),
