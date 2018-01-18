@@ -1,17 +1,19 @@
 import argparse
 import asyncio
-import logging
 import os
 import sys
 
+import uvloop
 from aiohttp import web
 from trafaret_config import commandline
 
-from .db import init_db
-from .middlewares import setup_middlewares
-from .routes import setup_routes
-from .signal import on_startup
-from .utils import TRAFARET_CONF
+from x_project_adv_logger.db import init_db
+from x_project_adv_logger.logger import logger
+from x_project_adv_logger.middlewares import setup_middlewares
+from x_project_adv_logger.routes import setup_routes
+from x_project_adv_logger.utils import TRAFARET_CONF
+
+asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 
 def init(loop, argv):
@@ -28,9 +30,7 @@ def init(loop, argv):
     config['socket'] = options.socket
     app = web.Application(loop=loop)
     app['config'] = config
-    init_db(app)
-
-    on_startup(app)
+    app.on_startup.append(init_db)
     setup_routes(app)
     setup_middlewares(app)
 
@@ -38,19 +38,11 @@ def init(loop, argv):
 
 
 def main(argv):
-    log = logging.getLogger('aiohttp')
-    log.setLevel(logging.INFO)
-    f = logging.Formatter('[L:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s', datefmt='%d-%m-%Y %H:%M:%S')
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.INFO)
-    ch.setFormatter(f)
-    log.addHandler(ch)
-
     loop = asyncio.get_event_loop()
-
     app = init(loop, argv)
-    app['log'] = log
+    app['log'] = logger
     if app['config']['socket']:
+        os.makedirs(os.path.dirname(app['config']['socket']), exist_ok=True)
         web.run_app(app, path=app['config']['socket'], backlog=1024, access_log=None)
     else:
         web.run_app(app, host=app['config']['host'], port=app['config']['port'], backlog=1024, access_log=None)

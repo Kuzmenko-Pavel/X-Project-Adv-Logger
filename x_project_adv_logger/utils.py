@@ -16,7 +16,7 @@ TRAFARET_CONF = T.Dict({
                     'block': T.String(),
                 })
         }),
-    T.Key('host'): T.String(regex=primitive_ip_regexp),
+    T.Key('host'): T.Regexp(primitive_ip_regexp),
     T.Key('port'): T.Int(),
 })
 

@@ -23,6 +23,7 @@ install_requires = ['aiohttp',
                     'motor',
                     'ujson',
                     'trafaret-config',
+                    'uvloop',
                     'pytz']
 
 setup(
