@@ -6,6 +6,7 @@ from x_project_adv_logger.headers import *
 
 
 class BlockView(web.View):
+    @cors(allow_origin='*')
     async def get(self):
         doc = {}
         headers = self.request.headers
@@ -25,10 +26,11 @@ class BlockView(web.View):
             doc['dt'] = dt
             doc['guid'] = guid
             doc['garanted'] = garanted
-            await self.request.app.block.insert(doc)
+            await self.request.app.db.block.insert(doc)
         return web.Response(body=body, content_type='application/x-javascript', charset='utf-8')
 
     @xml_http_request()
+    @cors(allow_origin='*')
     async def post(self):
         doc = {}
         headers = self.request.headers

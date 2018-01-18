@@ -51,7 +51,7 @@ class OfferView(web.View):
                 logger.warning(exception_message(exc=str(ex), data=data, request=str(self.request.message)))
 
         if len(docs) > 0:
-            await self.request.app.offer.insert(docs)
+            await self.request.app.db.offer.bulk_write(docs)
         else:
             logger.warning(exception_message(data=data, request=str(self.request.message)))
         return web.json_response({'status': 'ok'})

@@ -145,27 +145,33 @@ def xml_http_request():
     return wrapper
 
 
-def cors():
+def cors(allow_origin=None, allow_headers=None):
     def wrapper(func):
         @asyncio.coroutine
         @functools.wraps(func)
         def wrapped(*args):
+            ao = allow_origin
+            ah = allow_headers
             if isinstance(args[0], AbstractView):
                 request = args[0].request
             else:
                 request = args[-1]
+
+            if ao is None:
+                ao = '%s//:%s' % (request.scheme, request.host)
+            if ah is None:
+                ah = request.method
+
             if asyncio.iscoroutinefunction(func):
                 coro = func
             else:
                 coro = asyncio.coroutine(func)
             context = yield from coro(*args)
             if isinstance(context, web.StreamResponse):
-                context.headers[hdrs.ACCESS_CONTROL_ALLOW_ORIGIN] = '*'
-                context.headers[hdrs.ACCESS_CONTROL_ALLOW_HEADERS] = '*'
-                context.headers[hdrs.ACCESS_CONTROL_ALLOW_CREDENTIALS] = 'true'
-                context.headers[hdrs.ACCESS_CONTROL_ALLOW_METHODS] = '%s %s' % (hdrs.METH_GET, hdrs.METH_POST)
+                context.headers[hdrs.ACCESS_CONTROL_ALLOW_ORIGIN] = ao
+                # context.headers[hdrs.ACCESS_CONTROL_ALLOW_HEADERS] = ah
+                # context.headers[hdrs.ACCESS_CONTROL_ALLOW_METHODS] = '%s %s' % (hdrs.METH_GET, hdrs.METH_POST)
+                # context.headers[hdrs.ACCESS_CONTROL_ALLOW_CREDENTIALS] = 'true'
             return context
-
         return wrapped
-
     return wrapper
