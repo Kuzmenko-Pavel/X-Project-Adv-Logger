@@ -5,7 +5,8 @@ from pymongo import InsertOne
 from trafaret.constructor import construct
 
 from x_project_adv_logger.headers import *
-from x_project_adv_logger.utils import TRAFARET_OFFER_DATA, exception_message
+from x_project_adv_logger.logger import logger, exception_message
+from x_project_adv_logger.utils import TRAFARET_OFFER_DATA
 
 
 class OfferView(web.View):
@@ -16,8 +17,8 @@ class OfferView(web.View):
             validator = construct(TRAFARET_OFFER_DATA)
             data = await self.request.json()
             validator(data)
-        except Exception as e:
-            self.request.app['log'].warning(exception_message(exc=str(e), request=str(self.request._message)))
+        except Exception as ex:
+            logger.warning(exception_message(exc=str(ex), data=data, request=str(self.request.message)))
         else:
             try:
                 inf = data['params']['informer_id']
@@ -46,13 +47,11 @@ class OfferView(web.View):
                     doc['test'] = test
                     doc['request'] = request
                     docs.append(InsertOne(doc))
-            except Exception as e:
-                self.request.app['log'].warning(exception_message(exc=str(e),
-                                                                  data=data,
-                                                                  request=str(self.request._message)))
+            except Exception as ex:
+                logger.warning(exception_message(exc=str(ex), data=data, request=str(self.request.message)))
+
         if len(docs) > 0:
-            await self.request.app.offer.bulk_write(docs)
+            await self.request.app.offer.insert(docs)
         else:
-            self.request.app['log'].warning('EMPTY %s' % str(self.request._message))
-        resp_data = {'status': self.request.is_xml_http}
-        return web.json_response(resp_data)
+            logger.warning(exception_message(data=data, request=str(self.request.message)))
+        return web.json_response({'status': 'ok'})

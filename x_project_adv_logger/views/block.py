@@ -25,7 +25,7 @@ class BlockView(web.View):
             doc['dt'] = dt
             doc['guid'] = guid
             doc['garanted'] = garanted
-            await self.request.app.block.insert_one(doc)
+            await self.request.app.block.insert(doc)
         return web.Response(body=body, content_type='application/x-javascript', charset='utf-8')
 
     @xml_http_request()

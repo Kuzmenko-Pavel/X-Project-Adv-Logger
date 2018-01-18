@@ -7,7 +7,7 @@ import uvloop
 from aiohttp import web
 from trafaret_config import commandline
 
-from x_project_adv_logger.db import init_db
+from x_project_adv_logger.db import init_db, check_collection
 from x_project_adv_logger.logger import logger
 from x_project_adv_logger.middlewares import setup_middlewares
 from x_project_adv_logger.routes import setup_routes
@@ -31,6 +31,7 @@ def init(loop, argv):
     app = web.Application(loop=loop)
     app['config'] = config
     app.on_startup.append(init_db)
+    app.on_startup.append(check_collection)
     setup_routes(app)
     setup_middlewares(app)
 
