@@ -1,7 +1,7 @@
 host: 0.0.0.0
 port: 8080
 mongo:
-  uri: mongodb://srv-2.yottos.com:27017/?maxPoolSize=200&w=0
+  uri: mongodb://srv-4.yottos.com:27017/?maxPoolSize=200&w=0
   collection:
     offer: log.impressions
     block: log.impressions.block

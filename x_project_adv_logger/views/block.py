@@ -2,6 +2,8 @@ from datetime import datetime
 
 from aiohttp import web
 
+from x_project_adv_logger.headers import *
+
 
 class BlockView(web.View):
     async def get(self):
@@ -26,6 +28,7 @@ class BlockView(web.View):
             await self.request.app.block.insert_one(doc)
         return web.Response(body=body, content_type='application/x-javascript', charset='utf-8')
 
+    @xml_http_request()
     async def post(self):
         doc = {}
         headers = self.request.headers
@@ -35,7 +38,7 @@ class BlockView(web.View):
         rand = post.get('rand', self.request.query.get('rand', ''))
         garanted = True if request == 'complite' else False
         dt = datetime.now()
-        if headers.get('Referer', '') != '' and self.request.is_xml_http:
+        if headers.get('Referer', '') != '':
             doc['dt'] = dt
             doc['guid'] = guid
             doc['garanted'] = garanted
