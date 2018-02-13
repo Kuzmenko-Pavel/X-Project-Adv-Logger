@@ -1,8 +1,10 @@
+import re
 from datetime import datetime
 
 from aiohttp import web
 
 from x_project_adv_logger.headers import *
+from x_project_adv_logger.logger import logger, exception_message
 
 
 class BlockView(web.View):
@@ -10,6 +12,23 @@ class BlockView(web.View):
     async def get(self):
         doc = {}
         headers = self.request.headers
+        ip = '127.0.0.1'
+        ip_regex = re.compile(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$')
+        x_real_ip = headers.get('X-Real-IP', headers.get('X-Forwarded-For', ''))
+        x_real_ip_check = ip_regex.match(x_real_ip)
+        if x_real_ip_check:
+            x_real_ip = x_real_ip_check.group()
+        else:
+            x_real_ip = None
+        if x_real_ip is not None:
+            ip = x_real_ip
+        else:
+            try:
+                peername = self.request.transport.get_extra_info('peername')
+                if peername is not None and isinstance(peername, tuple):
+                    ip, _ = peername
+            except Exception as ex:
+                logger.error(exception_message(exc=str(ex), request=str(self.request.message)))
         guid = self.request.query.get('guid', '')
         request = self.request.query.get('request', 'initial')
         rand = self.request.query.get('rand', '')
@@ -25,6 +44,7 @@ class BlockView(web.View):
         else:
             doc['dt'] = dt
             doc['guid'] = guid
+            doc['ip'] = ip
             doc['garanted'] = garanted
             await self.request.app.db.block.insert(doc)
         return web.Response(body=body, content_type='application/x-javascript', charset='utf-8')
@@ -34,6 +54,23 @@ class BlockView(web.View):
     async def post(self):
         doc = {}
         headers = self.request.headers
+        ip = '127.0.0.1'
+        ip_regex = re.compile(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$')
+        x_real_ip = headers.get('X-Real-IP', headers.get('X-Forwarded-For', ''))
+        x_real_ip_check = ip_regex.match(x_real_ip)
+        if x_real_ip_check:
+            x_real_ip = x_real_ip_check.group()
+        else:
+            x_real_ip = None
+        if x_real_ip is not None:
+            ip = x_real_ip
+        else:
+            try:
+                peername = self.request.transport.get_extra_info('peername')
+                if peername is not None and isinstance(peername, tuple):
+                    ip, _ = peername
+            except Exception as ex:
+                logger.error(exception_message(exc=str(ex), request=str(self.request.message)))
         post = await self.request.post()
         guid = post.get('guid', self.request.query.get('guid', ''))
         request = post.get('request', self.request.query.get('request', 'initial'))
@@ -43,6 +80,7 @@ class BlockView(web.View):
         if headers.get('Referer', '') != '':
             doc['dt'] = dt
             doc['guid'] = guid
+            doc['ip'] = ip
             doc['garanted'] = garanted
             await self.request.app.block.insert_one(doc)
         resp_data = {'status': self.request.is_xml_http}
