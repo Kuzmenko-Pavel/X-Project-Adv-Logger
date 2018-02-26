@@ -168,9 +168,9 @@ def cors(allow_origin=None, allow_headers=None):
                 coro = asyncio.coroutine(func)
             context = yield from coro(*args)
             if isinstance(context, web.StreamResponse):
-                context.headers[hdrs.ACCESS_CONTROL_ALLOW_ORIGIN] = ao
+                context.headers[hdrs.ACCESS_CONTROL_ALLOW_ORIGIN] = '*'  # ao
                 # context.headers[hdrs.ACCESS_CONTROL_ALLOW_HEADERS] = ah
-                # context.headers[hdrs.ACCESS_CONTROL_ALLOW_METHODS] = '%s %s' % (hdrs.METH_GET, hdrs.METH_POST)
+                context.headers[hdrs.ACCESS_CONTROL_ALLOW_METHODS] = '%s %s' % (hdrs.METH_GET, hdrs.METH_POST)
                 # context.headers[hdrs.ACCESS_CONTROL_ALLOW_CREDENTIALS] = 'true'
             return context
         return wrapped
