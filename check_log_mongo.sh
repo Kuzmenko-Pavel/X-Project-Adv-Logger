@@ -1,5 +1,5 @@
 #!/bin/sh
-mongo srv-4.yottos.com:27017/getmyad ./check_log_mongo.js
+mongo srv-2.yottos.com:27017/getmyad ./check_log_mongo.js
 #mongo srv-2.yottos.com:27017/rg_0 ./check_log_mongo.js
 #mongo srv-2.yottos.com:27017/rg_1 ./check_log_mongo.js
 #mongo srv-2.yottos.com:27017/rg_2 ./check_log_mongo.js
