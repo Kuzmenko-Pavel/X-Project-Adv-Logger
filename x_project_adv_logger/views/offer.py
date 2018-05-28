@@ -22,7 +22,7 @@ class OfferView(web.View):
         else:
             try:
                 inf = data['params']['informer_id']
-                inf_int = data['params']['informer_id_int']
+                inf_int = int(data['params']['informer_id_int'])
                 ip = data['params']['ip']
                 cookie = data['params']['cookie']
                 request = data['params']['request']
@@ -32,7 +32,7 @@ class OfferView(web.View):
                     doc = {}
                     doc['dt'] = dt
                     doc['id'] = i['guid']
-                    doc['id_int'] = i['id']
+                    doc['id_int'] = int(i['id'])
                     doc['inf'] = inf
                     doc['inf_int'] = inf_int
                     doc['ip'] = ip
@@ -40,7 +40,7 @@ class OfferView(web.View):
                     doc['social'] = i['campaign_social']
                     doc['token'] = i['token']
                     doc['campaignId'] = i['campaign_guid']
-                    doc['campaignId_int'] = i['campaign_id']
+                    doc['campaignId_int'] = int(i['campaign_id'])
                     doc['retargeting'] = i['retargeting']
                     doc['branch'] = i['branch']
                     doc['conformity'] = 'place'
