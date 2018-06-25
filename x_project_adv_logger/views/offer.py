@@ -10,6 +10,7 @@ from x_project_adv_logger.utils import TRAFARET_OFFER_DATA
 
 
 class OfferView(web.View):
+    @detect_ip()
     @xml_http_request()
     async def post(self):
         docs = []
@@ -23,15 +24,18 @@ class OfferView(web.View):
             try:
                 inf = data['params']['informer_id']
                 inf_int = int(data['params']['informer_id_int'])
-                ip = data['params']['ip']
+                ip = self.request.ip
                 cookie = data['params']['cookie']
                 request = data['params']['request']
                 test = data['params']['test']
+                active = data['params'].get('active')
                 dt = datetime.now()
                 for i in data['items']:
                     doc = {}
                     doc['dt'] = dt
                     doc['id'] = i['guid']
+                    doc['block_impression'] = i['block_impression']
+                    doc['active'] = active
                     doc['id_int'] = int(i['id'])
                     doc['inf'] = inf
                     doc['inf_int'] = inf_int
@@ -47,11 +51,10 @@ class OfferView(web.View):
                     doc['test'] = test
                     doc['request'] = request
                     docs.append(InsertOne(doc))
+                if len(docs) > 0:
+                    await self.request.app.db.offer.bulk_write(docs)
+                else:
+                    raise Exception('Offer count 0')
             except Exception as ex:
                 logger.warning(exception_message(exc=str(ex), data=data, request=str(self.request.message)))
-
-        if len(docs) > 0:
-            await self.request.app.db.offer.bulk_write(docs)
-        else:
-            logger.warning(exception_message(data=data, request=str(self.request.message)))
         return web.json_response({'status': 'ok'})

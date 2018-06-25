@@ -1,12 +1,17 @@
-__all__ = ['cookie', 'csp', 'detect_webp', 'xml_http_request', 'cors']
+__all__ = ['cookie', 'csp', 'detect_webp', 'xml_http_request', 'cors', 'detect_ip']
 import asyncio
 import functools
+import re
 import time
 from datetime import datetime, timedelta
 from uuid import uuid4
 
 from aiohttp import web, hdrs
 from aiohttp.abc import AbstractView
+
+from x_project_adv_logger.logger import logger, exception_message
+
+ip_regex = re.compile(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$')
 
 
 def cookie(name='yottos_unique_id', domain='.yottos.com', days=365):
@@ -174,4 +179,48 @@ def cors(allow_origin=None, allow_headers=None):
                 # context.headers[hdrs.ACCESS_CONTROL_ALLOW_CREDENTIALS] = 'true'
             return context
         return wrapped
+    return wrapper
+
+
+def detect_ip():
+    def wrapper(func):
+        @asyncio.coroutine
+        @functools.wraps(func)
+        def wrapped(*args):
+            ip = '127.0.0.1'
+            if isinstance(args[0], AbstractView):
+                headers = args[0].request.headers
+                transport = args[0].request.transport
+            else:
+                headers = args[-1].headers
+                transport = args[-1].transport
+            x_real_ip = headers.get('X-Real-IP', headers.get('X-Forwarded-For', ''))
+            x_real_ip_check = ip_regex.match(x_real_ip)
+            if x_real_ip_check:
+                x_real_ip = x_real_ip_check.group()
+            else:
+                x_real_ip = None
+            if x_real_ip is not None:
+                ip = x_real_ip
+            else:
+                try:
+                    peername = transport.get_extra_info('peername')
+                    if peername is not None and isinstance(peername, tuple):
+                        ip, _ = peername
+                except Exception as ex:
+                    logger.error(exception_message(exc=str(ex)))
+
+            if isinstance(args[0], AbstractView):
+                args[0].request.ip = ip
+            else:
+                args[-1].ip = ip
+            if asyncio.iscoroutinefunction(func):
+                coro = func
+            else:
+                coro = asyncio.coroutine(func)
+            context = yield from coro(*args)
+            return context
+
+        return wrapped
+
     return wrapper
