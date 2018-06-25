@@ -30,11 +30,16 @@ class OfferView(web.View):
                 test = data['params']['test']
                 active = data['params'].get('active')
                 dt = datetime.now()
+                block_impression = 0
+                if len(data['items']) > 0:
+                    block_impression = 1.0 / len(data['items'])
+                else:
+                    raise Exception('Offer count 0')
                 for i in data['items']:
                     doc = {}
                     doc['dt'] = dt
                     doc['id'] = i['guid']
-                    doc['block_impression'] = i['block_impression']
+                    doc['block_impression'] = block_impression
                     doc['active'] = active
                     doc['id_int'] = int(i['id'])
                     doc['inf'] = inf
@@ -53,8 +58,7 @@ class OfferView(web.View):
                     docs.append(InsertOne(doc))
                 if len(docs) > 0:
                     await self.request.app.db.offer.bulk_write(docs)
-                else:
-                    raise Exception('Offer count 0')
+
             except Exception as ex:
                 logger.warning(exception_message(exc=str(ex), data=data, request=str(self.request.message)))
         return web.json_response({'status': 'ok'})
