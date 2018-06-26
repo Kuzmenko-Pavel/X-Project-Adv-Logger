@@ -30,7 +30,6 @@ class OfferView(web.View):
                 test = data['params']['test']
                 active = data['params'].get('active')
                 dt = datetime.now()
-                block_impression = 0
                 if len(data['items']) > 0:
                     block_impression = 1.0 / len(data['items'])
                 else:
