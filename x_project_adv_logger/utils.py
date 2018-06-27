@@ -23,7 +23,6 @@ TRAFARET_OFFER_DATA = T.Dict({
         T.Key('cookie'): T.String(),
         T.Key('informer_id'): T.String(),
         T.Key('informer_id_int'): T.Int(),
-        T.Key('active'): T.String(),
         T.Key('request'): T.String(),
         T.Key('test'): T.Bool(),
     }).ignore_extra('*'),
