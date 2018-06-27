@@ -26,9 +26,9 @@ class OfferView(web.View):
                 inf_int = int(data['params']['informer_id_int'])
                 ip = self.request.ip
                 cookie = data['params']['cookie']
-                request = data['params']['request']
+                request = data['params'].get('request', 'initial')
                 test = data['params']['test']
-                active = data['params'].get('active')
+                active = data['params'].get('active', 'initial')
                 dt = datetime.now()
                 if len(data['items']) > 0:
                     block_impression = 1.0 / len(data['items'])
