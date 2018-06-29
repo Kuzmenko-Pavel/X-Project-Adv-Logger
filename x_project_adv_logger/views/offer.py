@@ -14,6 +14,7 @@ class OfferView(web.View):
     @xml_http_request()
     async def post(self):
         docs = []
+        data = None
         try:
             validator = construct(TRAFARET_OFFER_DATA)
             data = await self.request.json()
