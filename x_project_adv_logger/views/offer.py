@@ -1,12 +1,21 @@
 from datetime import datetime
 
 from aiohttp import web
+from aiojobs.aiohttp import spawn
 from pymongo import InsertOne
+from pymongo.errors import BulkWriteError
 from trafaret.constructor import construct
 
 from x_project_adv_logger.headers import *
 from x_project_adv_logger.logger import logger, exception_message
 from x_project_adv_logger.utils import TRAFARET_OFFER_DATA
+
+
+async def bulk_write(collectin, docs):
+    try:
+        await collectin.bulk_write(docs)
+    except BulkWriteError as ex:
+        logger.warning(exception_message(exc=str(ex), docs=docs))
 
 
 class OfferView(web.View):
@@ -57,8 +66,7 @@ class OfferView(web.View):
                     doc['request'] = request
                     docs.append(InsertOne(doc))
                 if len(docs) > 0:
-                    await self.request.app.db.offer.bulk_write(docs)
-
+                    await spawn(self.request, bulk_write(self.request.app.db.offer, docs))
             except Exception as ex:
                 logger.warning(exception_message(exc=str(ex), data=data, request=str(self.request.message)))
         return web.json_response({'status': 'ok'})

@@ -1,8 +1,19 @@
 from datetime import datetime
 
 from aiohttp import web
+from aiojobs.aiohttp import spawn
+from pymongo import InsertOne
+from pymongo.errors import BulkWriteError
 
 from x_project_adv_logger.headers import *
+from x_project_adv_logger.logger import logger, exception_message
+
+
+async def bulk_write(collectin, docs):
+    try:
+        await collectin.bulk_write(docs)
+    except BulkWriteError as ex:
+        logger.warning(exception_message(exc=str(ex), docs=docs))
 
 
 class BlockView(web.View):
@@ -24,12 +35,12 @@ class BlockView(web.View):
             rand) + "\"|removeChild'.split('|'),0,{}))\n//]]>"
         if len(headers.get('Referer', '')) < 10:
             body = 'yta = {}'
-        else:
-            doc['dt'] = dt
-            doc['guid'] = guid
-            doc['ip'] = ip
-            doc['garanted'] = garanted
-            await self.request.app.db.block.insert(doc)
+
+        doc['dt'] = dt
+        doc['guid'] = guid
+        doc['ip'] = ip
+        doc['garanted'] = garanted
+        await spawn(self.request, bulk_write(self.request.app.db.block, [InsertOne(doc)]))
         return web.Response(body=body, content_type='application/x-javascript', charset='utf-8')
 
     @detect_ip()
@@ -37,20 +48,17 @@ class BlockView(web.View):
     @xml_http_request()
     async def post(self):
         doc = {}
-        headers = self.request.headers
         ip = self.request.ip
         post = await self.request.post()
         guid = post.get('guid', self.request.query.get('guid', ''))
         request = post.get('request', self.request.query.get('request', 'initial'))
-        rand = post.get('rand', self.request.query.get('rand', ''))
         garanted = True if request == 'complite' else False
         dt = datetime.now()
-        if headers.get('Referer', '') != '':
-            doc['dt'] = dt
-            doc['guid'] = guid
-            doc['ip'] = ip
-            doc['garanted'] = garanted
-            await self.request.app.block.insert_one(doc)
+        doc['dt'] = dt
+        doc['guid'] = guid
+        doc['ip'] = ip
+        doc['garanted'] = garanted
+        await spawn(self.request, bulk_write(self.request.app.db.block, [InsertOne(doc)]))
         resp_data = {'status': self.request.is_xml_http}
         return web.json_response(resp_data)
 

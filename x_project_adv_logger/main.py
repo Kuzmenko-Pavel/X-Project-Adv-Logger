@@ -5,6 +5,7 @@ import sys
 
 import uvloop
 from aiohttp import web
+from aiojobs.aiohttp import setup as aiojobs_setup
 from trafaret_config import commandline
 
 from x_project_adv_logger.db import init_db
@@ -33,7 +34,7 @@ def init(loop, argv):
     app.on_startup.append(init_db)
     setup_routes(app)
     setup_middlewares(app)
-
+    aiojobs_setup(app)
     return app
 
 
