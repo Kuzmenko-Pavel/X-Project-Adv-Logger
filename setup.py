@@ -20,6 +20,9 @@ def read_version():
 
 install_requires = ['aiohttp',
                     'aiodns',
+                    'async-timeout',
+                    'multidict',
+                    'pymongo',
                     'motor',
                     'ujson',
                     'trafaret-config',
