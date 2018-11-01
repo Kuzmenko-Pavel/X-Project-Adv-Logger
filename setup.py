@@ -29,7 +29,7 @@ install_requires = ['aiohttp',
                     'uvloop',
                     'cchardet',
                     'pytz',
-                    'aiojobs']
+                    'aiojobs==0.2.1']
 
 setup(
     name="X-Project-Adv-Logger",
