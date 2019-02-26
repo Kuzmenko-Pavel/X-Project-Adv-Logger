@@ -20,9 +20,9 @@ TRAFARET_CONF = T.Dict({
 TRAFARET_OFFER_DATA = T.Dict({
     T.Key('informer', optional=True): T.Any,
     T.Key('params'): T.Dict({
-        T.Key('cookie'): T.String(),
+        T.Key('cookie'): T.String(allow_blank=True),
         T.Key('informer_id'): T.String(),
-        T.Key('informer_id_int'): T.Int(),
+        T.Key('informer_id_int'): (T.Int() | T.String()),
         T.Key('request'): T.String(),
         T.Key('test'): T.Bool(),
     }).ignore_extra('*'),
