@@ -18,13 +18,26 @@ TRAFARET_CONF = T.Dict({
 })
 
 TRAFARET_OFFER_DATA = T.Dict({
-    T.Key('informer', optional=True): T.Any,
-    T.Key('params'): T.Dict({
-        T.Key('cookie'): T.String(allow_blank=True),
-        T.Key('informer_id'): T.String(),
-        T.Key('informer_id_int'): (T.Int() | T.String()),
-        T.Key('request'): T.String(),
-        T.Key('test'): T.Bool(),
+    T.Key('b'): T.Dict({
+        T.Key('id'): T.String(),
+        T.Key('sid'): T.String(),
+        T.Key('aid'): T.String(),
     }).ignore_extra('*'),
-    T.Key('items'): T.List(T.Any),
+    T.Key('p'): T.Dict({
+        T.Key('c'): T.String(allow_blank=True),
+        T.Key('r'): T.String(),
+        T.Key('a'): T.String(),
+        T.Key('t'): T.Bool(),
+    }).ignore_extra('*'),
+    T.Key('i'): T.List(
+        T.Dict({
+            T.Key('id'): T.String(),
+            T.Key('cid'): T.String(),
+            T.Key('aid'): T.String(),
+            T.Key('ib'): T.Float(),
+            T.Key('s'): T.Bool(),
+            T.Key('icr'): T.Float(),
+            T.Key('icl'): T.Float(),
+        }).ignore_extra('*')
+    )
 })

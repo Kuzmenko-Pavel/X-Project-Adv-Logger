@@ -32,38 +32,46 @@ class OfferView(web.View):
             logger.warning(exception_message(exc=str(ex), data=data, request=str(self.request.message)))
         else:
             try:
-                inf = data['params']['informer_id']
-                inf_int = int(data['params']['informer_id_int'])
                 ip = self.request.ip
-                cookie = data['params']['cookie']
-                request = data['params'].get('request', 'initial')
-                test = data['params']['test']
-                active = data['params'].get('active', 'initial')
+                cookie = data['p']['c']
+                request = data['p'].get('r', 'initial')
+                test = data['p']['t']
+                active = data['p'].get('a', 'initial')
                 dt = datetime.now()
-                if len(data['items']) > 0:
-                    block_impression = 1.0 / len(data['items'])
-                else:
+                id_block = data['b']['id']
+                id_site = data['b']['sid']
+                id_account_right = data['b']['aid']
+                if len(data['i']) <= 0:
                     raise Exception('Offer count 0')
-                for i in data['items']:
-                    doc = {}
-                    doc['dt'] = dt
-                    doc['id'] = i['guid']
-                    doc['block_impression'] = block_impression
-                    doc['active'] = active
-                    doc['id_int'] = int(i['id'])
-                    doc['inf'] = inf
-                    doc['inf_int'] = inf_int
-                    doc['ip'] = ip
-                    doc['cookie'] = cookie
-                    doc['social'] = i['campaign_social']
-                    doc['token'] = i['token']
-                    doc['campaignId'] = i['campaign_guid']
-                    doc['campaignId_int'] = int(i['campaign_id'])
-                    doc['retargeting'] = i['retargeting']
-                    doc['branch'] = i['branch']
-                    doc['conformity'] = 'place'
-                    doc['test'] = test
-                    doc['request'] = request
+
+                for i in data['i']:
+                    id_offer = data['b'][i]['id']
+                    id_campaign = data['b'][i]['cid']
+                    id_account_left = data['b'][i]['aid']
+                    impressions_block = data['b'][i]['ib']
+                    social = data['b'][i]['s']
+                    impressions_cost_right = data['b'][i]['icr']
+                    impressions_cost_left = data['b'][i]['icl']
+                    token = data['b'][i]['t']
+                    doc = {
+                        'ip': ip,
+                        'cookie': cookie,
+                        'request': request,
+                        'test': test,
+                        'active': active,
+                        'dt': dt,
+                        'id_block': id_block,
+                        'id_site': id_site,
+                        'id_account_right': id_account_right,
+                        'id_offer': id_offer,
+                        'id_campaign': id_campaign,
+                        'id_account_left': id_account_left,
+                        'impressions_block': impressions_block,
+                        'social': social,
+                        'token': token,
+                        'impressions_cost_right': impressions_cost_right,
+                        'impressions_cost_left': impressions_cost_left
+                    }
                     docs.append(InsertOne(doc))
                 if len(docs) > 0:
                     await spawn(self.request, bulk_write(self.request.app.db.offer, docs))
