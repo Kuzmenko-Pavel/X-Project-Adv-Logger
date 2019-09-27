@@ -45,14 +45,14 @@ class OfferView(web.View):
                     raise Exception('Offer count 0')
 
                 for i in data['i']:
-                    id_offer = data['b'][i]['id']
-                    id_campaign = data['b'][i]['cid']
-                    id_account_left = data['b'][i]['aid']
-                    impressions_block = data['b'][i]['ib']
-                    social = data['b'][i]['s']
-                    impressions_cost_right = data['b'][i]['icr']
-                    impressions_cost_left = data['b'][i]['icl']
-                    token = data['b'][i]['t']
+                    id_offer = i['id']
+                    id_campaign = i['cid']
+                    id_account_left = i['aid']
+                    impressions_block = i['ib']
+                    social = i['s']
+                    impressions_cost_right = i['icr']
+                    impressions_cost_left = i['icl']
+                    token = i['t']
                     doc = {
                         'ip': ip,
                         'cookie': cookie,

@@ -38,6 +38,7 @@ TRAFARET_OFFER_DATA = T.Dict({
             T.Key('s'): T.Bool(),
             T.Key('icr'): T.Float(),
             T.Key('icl'): T.Float(),
+            T.Key('t'): T.String(),
         }).ignore_extra('*')
     )
 })
