@@ -21,6 +21,7 @@ async def bulk_write(collectin, docs):
 class OfferView(web.View):
     @detect_ip()
     @cookie()
+    @cors(allow_origin='*')
     @xml_http_request()
     async def post(self):
         docs = []
