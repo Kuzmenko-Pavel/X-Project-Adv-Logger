@@ -20,6 +20,7 @@ async def bulk_write(collectin, docs):
 
 class OfferView(web.View):
     @detect_ip()
+    @cookie()
     @xml_http_request()
     async def post(self):
         docs = []

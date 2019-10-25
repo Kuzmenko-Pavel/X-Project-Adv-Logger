@@ -3,6 +3,13 @@ import asyncio
 import os
 import sys
 
+try:
+    from http.cookies import Morsel
+
+    Morsel._reserved['samesite'] = 'SameSite'
+except Exception:
+    pass
+
 import uvloop
 from aiohttp import web
 from aiojobs.aiohttp import setup as aiojobs_setup

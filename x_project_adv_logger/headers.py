@@ -41,7 +41,12 @@ def cookie(name='yottos_unique_id', domain='.yottos.com', days=365):
                 context.set_cookie(name, user_cookie,
                                    expires=user_cookie_expires,
                                    domain=domain,
+                                   secure=True,
                                    max_age=user_cookie_max_age)
+                try:
+                    context._cookies[name]['samesite'] = None
+                except Exception:
+                    pass
             return context
 
         return wrapped
@@ -163,7 +168,11 @@ def cors(allow_origin=None, allow_headers=None):
                 request = args[-1]
 
             if ao is None:
-                ao = '%s//:%s' % (request.scheme, request.host)
+                host = request.host
+                scheme = request.scheme
+                if 'yottos.com' in host:
+                    scheme = 'https'
+                ao = '%s//:%s' % (scheme, host)
             if ah is None:
                 ah = request.method
 
@@ -173,10 +182,10 @@ def cors(allow_origin=None, allow_headers=None):
                 coro = asyncio.coroutine(func)
             context = yield from coro(*args)
             if isinstance(context, web.StreamResponse):
-                context.headers[hdrs.ACCESS_CONTROL_ALLOW_ORIGIN] = '*'  # ao
-                # context.headers[hdrs.ACCESS_CONTROL_ALLOW_HEADERS] = ah
+                context.headers[hdrs.ACCESS_CONTROL_ALLOW_ORIGIN] = ao
+                context.headers[hdrs.ACCESS_CONTROL_ALLOW_HEADERS] = ah
                 context.headers[hdrs.ACCESS_CONTROL_ALLOW_METHODS] = '%s %s' % (hdrs.METH_GET, hdrs.METH_POST)
-                # context.headers[hdrs.ACCESS_CONTROL_ALLOW_CREDENTIALS] = 'true'
+                context.headers[hdrs.ACCESS_CONTROL_ALLOW_CREDENTIALS] = 'true'
             return context
         return wrapped
     return wrapper
