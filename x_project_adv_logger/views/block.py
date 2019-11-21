@@ -18,6 +18,7 @@ async def bulk_write(collectin, docs):
 
 class BlockView(web.View):
     @detect_ip()
+    @cookie()
     @cors(allow_origin='*')
     async def get(self):
         doc = {}
