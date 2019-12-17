@@ -75,3 +75,20 @@ if (!db[collection_name].validate().valid || !db.log.click.stats().capped) {
 else {
     print("Database " + collection_name + " OK");
 }
+
+
+collection_name = 'log.goals';
+if (!db[collection_name].validate().valid || !db.log.click.stats().capped) {
+    print("Database " + collection_name + " broken, recreating collections");
+    db[collection_name].drop();
+    db.createCollection(collection_name, {
+        capped: true,
+        max: 5000000,
+        size: 5000000 * 1000
+    });
+    db[collection_name].ensureIndex({"dt": 1});
+
+}
+else {
+    print("Database " + collection_name + " OK");
+}
