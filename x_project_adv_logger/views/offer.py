@@ -43,6 +43,12 @@ class OfferView(web.View):
                 id_block = data['b']['id']
                 id_site = data['b']['sid']
                 id_account_right = data['b']['aid']
+                vw = data['b'].get('vw', '')
+                vh = data['b'].get('vh', '')
+                w = data['b'].get('w', '')
+                h = data['b'].get('h', '')
+                loc = data['b'].get('loc', '')
+                ref = data['b'].get('ref', '')
                 if len(data['i']) <= 0:
                     raise Exception('Offer count 0')
 
@@ -62,6 +68,12 @@ class OfferView(web.View):
                         'test': test,
                         'active': active,
                         'dt': dt,
+                        'vw': vw,
+                        'vh': vh,
+                        'w': w,
+                        'h': h,
+                        'loc': loc,
+                        'ref': ref,
                         'id_block': id_block,
                         'id_site': id_site,
                         'id_account_right': id_account_right,
