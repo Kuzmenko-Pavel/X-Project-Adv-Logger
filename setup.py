@@ -18,17 +18,19 @@ def read_version():
             raise RuntimeError(msg)
 
 
-install_requires = ['aiohttp',
-                    'aiodns',
-                    'async-timeout',
-                    'multidict',
-                    'pymongo',
-                    'motor',
-                    'ujson',
-                    'trafaret-config',
-                    'uvloop',
-                    'cchardet',
-                    'pytz',
+install_requires = ['aiohttp==2.3.10',
+                    'aiodns==2.0.0',
+                    'async-timeout==2.0.1',
+                    'multidict==4.7.5',
+                    'pymongo==3.10.1',
+                    'motor==2.1.0',
+                    'ujson==2.0.2',
+                    'trafaret==2.0.2',
+                    'trafaret-config==2.0.2',
+                    'uvloop==0.14.0',
+                    'cchardet==2.1.6',
+                    'chardet==3.0.4',
+                    'pytz==2019.3',
                     'aiojobs==0.2.1']
 
 setup(

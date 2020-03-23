@@ -15,14 +15,13 @@ from aiohttp import web
 from aiojobs.aiohttp import setup as aiojobs_setup
 from trafaret_config import commandline
 
-from x_project_adv_logger.db import init_db
+from x_project_adv_logger.db import init_db, close_db
 from x_project_adv_logger.logger import logger
 from x_project_adv_logger.middlewares import setup_middlewares
 from x_project_adv_logger.routes import setup_routes
 from x_project_adv_logger.utils import TRAFARET_CONF
 
-asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-
+uvloop.install()
 
 def init(loop, argv):
     dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -38,10 +37,11 @@ def init(loop, argv):
     config['socket'] = options.socket
     app = web.Application(loop=loop)
     app['config'] = config
-    app.on_startup.append(init_db)
     setup_routes(app)
     setup_middlewares(app)
     aiojobs_setup(app)
+    app.on_startup.append(init_db)
+    app.on_cleanup.append(close_db)
     return app
 
 

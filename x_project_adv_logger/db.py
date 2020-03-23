@@ -10,10 +10,20 @@ class DbWrapper():
 
     def __init__(self, conf):
         self.conf = conf
-        self.client = ma.AsyncIOMotorClient(conf['uri'])
+        self.client = ma.AsyncIOMotorClient(
+            conf['uri'],
+            maxPoolSize=20,
+            minPoolSize=2,
+            maxIdleTimeMS=1000 * 60,
+            w=0,
+            journal=False
+        )
         self.db = self.client[conf['db']]
         self.block_name = conf['collection']['block']
         self.offer_name = conf['collection']['offer']
+
+    async def close(self):
+        self.client.close()
 
     @property
     def block(self):
@@ -60,3 +70,7 @@ async def init_db(app):
     conf = app['config']['mongo']
     app.db = DbWrapper(conf)
     await app.db.check_collection()
+
+
+async def close_db(app):
+    await app.db.close()
