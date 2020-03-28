@@ -1,9 +1,12 @@
+import json
 from datetime import datetime
+from json.decoder import JSONDecodeError
 
 from aiohttp import web
 from aiojobs.aiohttp import spawn
 from pymongo import InsertOne
 from pymongo.errors import BulkWriteError
+from trafaret import DataError
 from trafaret.constructor import construct
 
 from x_project_adv_logger.headers import *
@@ -28,10 +31,32 @@ class OfferView(web.View):
         data = None
         try:
             validator = construct(TRAFARET_OFFER_DATA)
-            data = await self.request.json()
+
+            data = await self.request.json(loads=json.loads)
+
             validator(data)
-        except Exception as ex:
-            logger.warning(exception_message(exc=str(ex), data=data, request=str(self.request.message)))
+
+        except JSONDecodeError as e:
+            logger.warning(exception_message(msg='JSON Fail',
+                                             exc=str(e),
+                                             text=await self.request.text(),
+                                             request=str(self.request.message)
+                                             )
+                           )
+        except DataError as e:
+            logger.warning(exception_message(msg='Not Valid Data',
+                                             exc=str(e.as_dict()),
+                                             struct=str(e.to_struct()),
+                                             data=data,
+                                             text=await self.request.text(),
+                                             request=str(self.request.message))
+                           )
+        except Exception as e:
+            logger.error(exception_message(exc=str(e),
+                                           data=data,
+                                           text=await self.request.text(),
+                                           request=str(self.request.message))
+                         )
         else:
             try:
                 test = data['p']['t']
